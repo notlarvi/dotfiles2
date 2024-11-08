@@ -1,0 +1,341 @@
+#+TITLE: King's Emacs Config
+#+AUTHOR: King
+
+* Set up use-package
+#+begin_src emacs-lisp
+    (require 'package)
+  
+    (setq package-archives '(("melpa"  . "https://melpa.org/packages/")
+                             ("org" . "https://orgmode.org/elpa/")
+                             ("elpa" . "https://elpa.gnu.org/packages/")))
+    (package-initialize)
+    (unless package-archive-contents
+      (package-refresh-contents))
+  
+    (require 'use-package)
+    (setq use-package-always-ensure t)
+#+end_src
+* Appearance
+** Disable GUI
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+
+  (set-fringe-mode 10)
+  (menu-bar-mode -1)
+
+  (setq visible-bell t)
+#+end_src
+** Theme
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :init
+    (load-theme 'modus-vivendi t))
+#+end_src
+** Font
+#+begin_src emacs-lisp
+  (add-to-list 'default-frame-alist
+               ;; '(font . "Hack Nerd Font Mono"))
+               ;; '(font . "IBM Plex Mono"))
+               '(font . "Terminus 10"))
+#+end_src
+** Modeline
+*** TODO Maybe configure the default one?
+#+begin_src emacs-lisp
+;;  (use-package doom-modeline
+;;    :ensure t
+;;    :init (doom-modeline-mode 1))
+;;  (setq doom-modeline-modal-icon t)
+#+end_src
+** Line numbers
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode t)
+  (setq display-line-numbers-type 'relative)
+#+end_src
+** Rainbow Delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+* Keybinds
+** which-key
+#+begin_src emacs-lisp
+  (use-package which-key)
+  (which-key-mode)
+#+end_src
+** eVIl mode
+#+begin_src emacs-lisp
+  (setq evil-undo-system 'undo-redo)
+  (use-package evil
+    :init (setq evil-want-keybinding nil))
+
+  ;; Enable Evil
+  (require 'evil)
+
+  (evil-mode 1)
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+  #+end_src
+*** evil-org
+#+begin_src emacs-lisp
+  (use-package evil-org
+    :ensure t
+    :after org
+    :hook (org-mode . evil-org-mode)
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
+#+end_src
+- [ ] Learn Keybinds
+** general.el
+#+begin_src emacs-lisp
+  (use-package general
+    :config
+    (general-evil-setup t)
+    (general-create-definer king/leader
+      ;; :states '(normal visual)
+      :keymaps '(normal visual emacs)
+      :prefix "SPC"))
+  ;; KEYBINDS BEGIN 
+  (king/leader
+    "o" '(:ignore t :which-key "open ...")
+    "on" '((lambda () (interactive) (find-file org-default-notes-file)) :which-key "open notes") ;; https://emacs.stackexchange.com/a/33920/45428
+    "oc" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :which-key "open config")
+    "of" 'find-file
+    "oa" 'org-agenda-list
+    "ot" 'org-todo-list
+    "oj" 'org-journal-open-current-journal-file
+
+
+    "c" '(:ignore t :which-key "capture ...")
+    "cj" 'org-journal-new-entry
+    "ct" 'org-capture
+
+    "s" '(:ignore t :which-key "store ...")
+    "sl" 'org-store-link
+
+    "a" '(:ignore t :which-key "add ...")
+    "ad" 'org-deadline
+    "as" 'org-schedule
+    "af" 'org-footnote-new
+    "ac" 'insert-char
+    "as" 'org-insert-subheading
+
+
+    "i" '(:ignore t :which-key "insert ...")
+    "il" 'org-insert-link
+    "is" 'org-insert-last-stored-link
+    "ih" 'org-insert-heading-after-current
+    "ii" 'org-download-clipboard
+
+    "d" '(:ignore t :which-key "delete ...")
+    "dt" 'org-cut-subtree
+
+  
+    "p" '(:ignore t :which-key "paste ...")
+    "pt" 'org-paste-subtree
+
+    "t" '(:ignore t :which-key "toggle ...")
+    "ts" 'org-toggle-narrow-to-subtree
+    "tt" 'org-todo
+    "tl" 'org-latex-preview
+    "tc" 'org-cycle-list-bullet
+    "th" 'org-toggle-heading
+    "tn" 'org-num-mode
+    )
+#+end_src
+* Org
+#+begin_src emacs-lisp
+    (setq org-agenda-files '("~/org"))
+    (add-hook 'org-mode-hook 'visual-line-mode)
+    (add-hook 'org-mode-hook 'org-cdlatex-mode)
+    ;; Local footnotes.
+    (setq org-footnote-section nil
+  org-enforce-todo-checkbox-dependencies t
+  org-enforce-todo-dependencies t)
+  ;; make images normal
+  (setq org-image-actual-width 300)
+#+end_src
+** Org d2 
+#+begin_src emacs-lisp
+;;  (use-package ob-d2
+;;  :ensure t)
+#+end_src
+** Org Todo
+#+begin_src emacs-lisp
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
+
+  ;; Add a timestamp when closing tasks
+  ;; Maybe add a separate keybind when I want to add a comment to a closing task
+  (setq org-log-done 'time)
+#+end_src
+** org-download (paste images)
+#+begin_src emacs-lisp
+ (use-package org-download) 
+#+end_src
+** org-ql
+#+begin_src emacs-lisp
+  (use-package org-ql)
+#+end_src
+** Org Table Alignment
+#+begin_src emacs-lisp
+    (use-package valign
+    :hook (org-mode . valign-mode))
+#+end_src
+** Org Babel
+#+begin_src emacs-lisp
+;;  (use-package ob-go)
+;;  (use-package org
+;;  :after ob-d2
+;;  :config
+;;  (org-babel-do-load-languages
+;;   'org-babel-load-languages
+;;   '((d2 . t))))
+;;  (use-package org
+;;  :after ob-d2
+;;  :config
+;;  (org-babel-do-load-languages
+;;   'org-babel-load-languages
+;;   '(
+;;     (C . t)  ; provide C, C++, and D
+;;     (python . t)  ; provide C, C++, and D
+;;     (go . t)  ; provide C, C++, and D
+;;     (d2 . t)  ; provide C, C++, and D
+;;     )))
+
+#+end_src
+
+*** Treesitter
+#+begin_src emacs-lisp
+  (setq treesit-language-source-alist '(
+     (go "https://github.com/tree-sitter/tree-sitter-go")))
+#+end_src
+** Org Journal
+#+begin_src emacs-lisp
+  (use-package org-journal
+    :init (setq org-journal-file-type 'yearly)
+    (setq org-journal-dir "~/org/journal")
+    (setq org-journal-file-format "%Y.org"))
+#+end_src
+** Org Appearance
+*** Header styles
+Might need to rework this
+#+begin_src emacs-lisp
+  ;; Maybe I don't like them hidden
+  ;; (setq org-hide-emphasis-markers t) ;; Markers
+
+  ;; (add-hook 'org-mode-hook 'org-indent-mode) ;; Org Indent Mode
+
+  (use-package org-modern
+    :hook ((org-mode . org-modern-mode)
+           (org-agenda-finalize-hook . org-modern-agenda))
+    :init (setq org-modern-star 'fold
+                org-modern-table nil))
+
+  (set-face-attribute 'variable-pitch nil :family "DejaVu Serif")
+
+  (set-face-attribute 'variable-pitch nil :slant 'italic)
+
+  (set-face-attribute 'variable-pitch nil :height 120)
+#+end_src
+** Org Capture
+#+begin_src emacs-lisp
+  (setq org-default-notes-file (concat org-directory "/life.org"))
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/org/life.org" "Tasks")
+           "* TODO %?\n  %i\n  %a")
+          ("j" "Journal" entry (file+datetree "~/org/life.org")
+           "* %i %?")
+          ("r" "Refile" plain (file+headline "~/org/life.org" "Refile")
+           "** %? \n%a")))
+#+end_src
+** LaTeX
+#+begin_src emacs-lisp
+;;  (use-package org-fragtog
+;;    :hook (org-mode . org-fragtog-mode))
+  ;; Bigger previews
+  (plist-put org-format-latex-options :scale 1.5) ;; https://tex.stackexchange.com/a/78587
+  (use-package cdlatex)
+  ;; (add-to-list 'org-export-latex-packages-alist '("english,russian" "babel" t))
+  ;; fixes something idkkkkkk
+#+end_src
+** LaTeX Org Table Align
+#+begin_src emacs-lisp
+  ;;  (add-to-list 'load-path "/home/meowking/.config/emacs/orgplus-align-tables")
+  ;;  (with-eval-after-load 'org-mode
+  ;;  (require 'org+-align-table))
+  
+#+end_src
+** Math Delimeters
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "/home/meowking/.config/emacs/math-delimiters")
+  (autoload 'math-delimiters-insert "math-delimiters")
+  (with-eval-after-load 'org
+    (define-key org-mode-map "$" #'math-delimiters-insert))
+
+  (with-eval-after-load 'cdlatex
+    (define-key cdlatex-mode-map "$" nil))
+#+end_src
+** Org LaTeX previews
+#+begin_src emacs-lisp
+;;  (plist-put org-latex-preview-appearance-options
+;;             :page-width 0.8)
+;;  ;; Turn on auto-mode, it's built into Org and much faster/more featured than
+;;  ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
+;;  (add-hook 'org-mode-hook 'org-latex-preview-auto-mode)
+;;
+;;  ;; Block C-n, C-p etc from opening up previews when using auto-mode
+;;  (setq org-latex-preview-auto-ignored-commands
+;;        '(next-line previous-line mwheel-scroll
+;;          scroll-up-command scroll-down-command))
+;;
+;;  ;; Enable consistent equation numbering
+;;  (setq org-latex-preview-numbered t)
+;;
+;;  ;; Bonus: Turn on live previews.  This shows you a live preview of a LaTeX
+;;  ;; fragment and updates the preview in real-time as you edit it.
+;;  ;; To preview only environments, set it to '(block edit-special) instead
+;;  (setq org-latex-preview-live t)
+;;
+;;  ;; More immediate live-previews -- the default delay is 1 second
+;;  (setq org-latex-preview-live-debounce 0.25)
+#+end_src
+* Utils
+** Completion
+*** Ivy
+#+begin_src emacs-lisp
+  (use-package ivy
+    :config
+    (ivy-mode 1))
+#+end_src
+**** Counsel
+#+begin_src emacs-lisp
+  (use-package counsel
+    :bind (("M-x" . counsel-M-x)
+           ("C-x b" . counsel-switch-buffer) ;; i like switch buffer more
+           ("C-x C-f" . counsel-find-file)))
+#+end_src
+**** Ivy-rich
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
+#+end_src
+* Coms
+** Element
+#+begin_src emacs-lisp
+;;  (use-package ement)
+;;  (setq ement-save-sessions t)
+#+end_src
+* Resources
+[[https://github.com/noctuid/evil-guide]]
+[[https://magnus.therning.org/2023-07-09-general.el-and-two-ways-to-define-keybindings.html]]
+* Things to look into
+** Meow keybinds
+Seems like very much non intrusive modal editing.
