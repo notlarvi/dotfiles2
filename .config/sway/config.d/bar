@@ -1,0 +1,25 @@
+set {
+  $black #000000
+  $light_gray #E5E5E5
+}
+bar {
+  height 14
+  mode hide
+  font Terminus 9
+  position bottom
+
+    # When the status_command prints a new line to stdout, swaybar updates.
+    # The default just shows the current date and time.
+  status_command while date +'%Y-%m-%d %R'; do sleep 1; done
+
+  colors {
+#	separator #ffffff
+#	focused_workspace #ffffff #ffffff #ffffff 
+#	active_workspace #ffffff #ffffff #ffffff 
+#	inactive_workspace #ffffff #ffffff #ffffff 
+#	urgent_workspace #ffffff #ffffff #ffffff 
+#        inactive_workspace #32323200 #32323200 #5c5c5c
+    statusline $light_gray
+    background $black
+  }
+}

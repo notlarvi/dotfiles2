@@ -9,6 +9,8 @@ vim.o.expandtab = true -- Changes tabs to spaces. Use CTRL-V<Tab> to insert a re
 vim.o.nu = true
 vim.o.rnu = true
 
+-- TODO Fix this and enable lazy loading for mason
+vim.opt.path:append('~/.local/share/nvim/mason/bin')
 -- Statusline
 require("config.statusline")
 -- Keybindings

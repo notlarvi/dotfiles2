@@ -1,0 +1,6 @@
+input type:keyboard {
+    xkb_layout real-prog-dvorak,ru
+    xkb_options caps:swapescape,grp:rctrl_toggle
+    repeat_delay 500
+    repeat_rate 50
+}

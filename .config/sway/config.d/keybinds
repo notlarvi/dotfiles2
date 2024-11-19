@@ -1,0 +1,26 @@
+set $mod Mod4
+set $altmod Mod1
+
+    # Start a terminal
+    set $term foot
+    bindsym $mod+Return exec $term
+
+    # Kill focused window
+    bindsym $mod+Shift+q kill
+
+    # Start your launcher
+    set $menu bemenu-run --fn Terminus 12 | xargs swaymsg exec --
+    bindsym $mod+d exec $menu
+
+    # Take a screenshot
+    bindsym $mod+p exec grim -g "$(slurp)" - | wl-copy
+
+    # Volume controls (Pipewire)
+    bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_SINK@ 5%+
+    bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_SINK@ 5%-
+
+
+    # Reload the configuration file
+    bindsym $mod+Shift+c reload
+
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'really exit?' -B 'Yes, exit sway' 'swaymsg exit'

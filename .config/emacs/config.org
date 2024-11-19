@@ -40,15 +40,14 @@
   (add-to-list 'default-frame-alist
                ;; '(font . "Hack Nerd Font Mono"))
                ;; '(font . "IBM Plex Mono"))
-               '(font . "Terminus 10"))
+               '(font . "Hack 10"))
 #+end_src
 ** Modeline
 *** TODO Maybe configure the default one?
 #+begin_src emacs-lisp
-;;  (use-package doom-modeline
-;;    :ensure t
-;;    :init (doom-modeline-mode 1))
-;;  (setq doom-modeline-modal-icon t)
+  (use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 #+end_src
 ** Line numbers
 #+begin_src emacs-lisp
@@ -109,6 +108,7 @@
     "oc" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :which-key "open config")
     "of" 'find-file
     "oa" 'org-agenda-list
+    "oa" 'org-agenda-list
     "ot" 'org-todo-list
     "oj" 'org-journal-open-current-journal-file
 
@@ -125,7 +125,7 @@
     "as" 'org-schedule
     "af" 'org-footnote-new
     "ac" 'insert-char
-    "as" 'org-insert-subheading
+    ;;"as" 'org-insert-subheading
 
 
     "i" '(:ignore t :which-key "insert ...")
@@ -137,17 +137,25 @@
     "d" '(:ignore t :which-key "delete ...")
     "dt" 'org-cut-subtree
 
-  
+
     "p" '(:ignore t :which-key "paste ...")
     "pt" 'org-paste-subtree
+
+    "c" '(:ignore t :which-key "clock ...")
+    "ci" 'org-clock-in
+    "co" 'org-clock-out
+  
+    "f" '(:ignore t :which-key "fold ...")
+    "fa" 'org-fold-show-all
 
     "t" '(:ignore t :which-key "toggle ...")
     "ts" 'org-toggle-narrow-to-subtree
     "tt" 'org-todo
     "tl" 'org-latex-preview
-    "tc" 'org-cycle-list-bullet
+    "tc" 'org-clock-display
     "th" 'org-toggle-heading
     "tn" 'org-num-mode
+    "ti" 'org-display-inline-images
     )
 #+end_src
 * Org
@@ -169,7 +177,7 @@
 #+end_src
 ** Org Todo
 #+begin_src emacs-lisp
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "SOMEDAY(s)" "QUEUED(q)" "READING(i)" "|" "DONE(d)" "CANCELLED(c)" "READ(r!)")))
 
   ;; Add a timestamp when closing tasks
   ;; Maybe add a separate keybind when I want to add a comment to a closing task
@@ -181,12 +189,12 @@
 #+end_src
 ** org-ql
 #+begin_src emacs-lisp
-  (use-package org-ql)
+;;  (use-package org-ql)
 #+end_src
 ** Org Table Alignment
 #+begin_src emacs-lisp
-    (use-package valign
-    :hook (org-mode . valign-mode))
+;;    (use-package valign
+;;    :hook (org-mode . valign-mode))
 #+end_src
 ** Org Babel
 #+begin_src emacs-lisp
@@ -218,10 +226,10 @@
 #+end_src
 ** Org Journal
 #+begin_src emacs-lisp
-  (use-package org-journal
-    :init (setq org-journal-file-type 'yearly)
-    (setq org-journal-dir "~/org/journal")
-    (setq org-journal-file-format "%Y.org"))
+;;  (use-package org-journal
+;;    :init (setq org-journal-file-type 'yearly)
+;;    (setq org-journal-dir "~/org/journal")
+;;    (setq org-journal-file-format "%Y.org"))
 #+end_src
 ** Org Appearance
 *** Header styles
@@ -230,13 +238,14 @@ Might need to rework this
   ;; Maybe I don't like them hidden
   ;; (setq org-hide-emphasis-markers t) ;; Markers
 
-  ;; (add-hook 'org-mode-hook 'org-indent-mode) ;; Org Indent Mode
+  (add-hook 'org-mode-hook 'org-indent-mode) ;; Org Indent Mode
 
   (use-package org-modern
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize-hook . org-modern-agenda))
-    :init (setq org-modern-star 'fold
-                org-modern-table nil))
+    :init (setq org-modern-star nil
+                org-modern-table nil
+                org-modern-checkbox nil))
 
   (set-face-attribute 'variable-pitch nil :family "DejaVu Serif")
 
